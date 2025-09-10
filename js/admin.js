@@ -182,7 +182,12 @@ async function loadEvents() {
     const eventsGrid = document.getElementById('events-grid');
     
     try {
-        const events = await window.dataSync.loadEvents();
+        // Cargar desde localStorage primero, luego desde archivo
+        let events = JSON.parse(localStorage.getItem('clubEvents')) || [];
+        
+        if (events.length === 0) {
+            events = await window.githubSync.loadEvents();
+        }
         
         if (events.length === 0) {
             eventsGrid.innerHTML = `
@@ -253,12 +258,12 @@ function openEventModal(eventId = null) {
     modal.style.display = 'block';
 }
 
-function saveEvent(e) {
+async function saveEvent(e) {
     e.preventDefault();
     
     const form = e.target;
     const eventData = {
-        id: form.dataset.eventId || generateId(),
+        id: form.dataset.eventId || window.githubSync.generateId(),
         title: document.getElementById('event-title').value,
         date: document.getElementById('event-date').value,
         time: document.getElementById('event-time').value,
@@ -267,8 +272,10 @@ function saveEvent(e) {
         image: document.getElementById('event-image').value || ''
     };
     
-    // Cargar eventos actuales y agregar/actualizar
-    window.dataSync.loadEvents().then(events => {
+    try {
+        // Cargar eventos actuales
+        let events = JSON.parse(localStorage.getItem('clubEvents')) || [];
+        
         if (form.dataset.eventId) {
             // Actualizar evento existente
             const index = events.findIndex(e => e.id == form.dataset.eventId);
@@ -280,26 +287,39 @@ function saveEvent(e) {
             events.push(eventData);
         }
         
-        // Mostrar modal con instrucciones para actualizar el archivo
-        window.dataSync.showUpdateInstructions(events, 'eventos.json', form.dataset.eventId ? 'actualizar' : 'agregar');
+        // Guardar usando el nuevo sistema
+        await window.githubSync.saveEvents(events);
         
-        // Cerrar modal de edición
+        // Recargar la lista de eventos
+        loadEvents();
+        
+        // Cerrar modal
         document.getElementById('event-modal').style.display = 'none';
         
-        showNotification('¡Evento preparado! Sigue las instrucciones para publicarlo.', 'info');
-    });
+    } catch (error) {
+        console.error('Error saving event:', error);
+        showNotification('Error al guardar el evento', 'error');
+    }
 }
 
 function editEvent(eventId) {
     openEventModal(eventId);
 }
 
-function deleteEvent(eventId) {
+async function deleteEvent(eventId) {
     if (confirm('¿Estás seguro de que quieres eliminar este evento?')) {
-        AdminData.events = AdminData.events.filter(e => e.id !== eventId);
-        AdminData.saveEvents();
-        loadEvents();
-        showNotification('Evento eliminado correctamente', 'success');
+        try {
+            let events = JSON.parse(localStorage.getItem('clubEvents')) || [];
+            events = events.filter(e => e.id != eventId);
+            
+            await window.githubSync.saveEvents(events);
+            loadEvents();
+            
+            showNotification('Evento eliminado correctamente', 'success');
+        } catch (error) {
+            console.error('Error deleting event:', error);
+            showNotification('Error al eliminar el evento', 'error');
+        }
     }
 }
 

@@ -3,8 +3,13 @@ document.addEventListener('DOMContentLoaded', function() {
     loadDynamicContent();
     
     // Escuchar cambios desde el panel de administración
-    window.addEventListener('adminDataUpdated', function(e) {
-        console.log('Datos actualizados desde admin, recargando contenido...');
+    window.addEventListener('eventsUpdated', function(e) {
+        console.log('Eventos actualizados, recargando...');
+        loadDynamicContent();
+    });
+    
+    window.addEventListener('activitiesUpdated', function(e) {
+        console.log('Actividades actualizadas, recargando...');
         loadDynamicContent();
     });
     
@@ -275,10 +280,15 @@ function loadDynamicContent() {
 // Load events from JSON file
 async function loadDynamicEvents() {
     try {
-        // Cargar eventos desde el archivo JSON compartido
-        const events = await window.dataSync.loadEvents();
-        const eventsSlider = document.querySelector('.events-slider');
+        // Intentar cargar desde localStorage primero (datos inmediatos del admin)
+        let events = JSON.parse(localStorage.getItem('clubEvents')) || [];
         
+        // Si no hay datos locales, cargar desde archivo JSON
+        if (events.length === 0) {
+            events = await window.githubSync.loadEvents();
+        }
+        
+        const eventsSlider = document.querySelector('.events-slider');
         if (!eventsSlider) return;
         
         // Filtrar solo eventos futuros (incluye el día actual)
@@ -331,9 +341,15 @@ async function loadDynamicEvents() {
 // Load activities from JSON file
 async function loadDynamicActivities() {
     try {
-        const activities = await window.dataSync.loadActivities();
-        const activitiesGrid = document.querySelector('.activities-grid');
+        // Intentar cargar desde localStorage primero
+        let activities = JSON.parse(localStorage.getItem('clubActivities')) || [];
         
+        // Si no hay datos locales, cargar desde archivo JSON
+        if (activities.length === 0) {
+            activities = await window.githubSync.loadActivities();
+        }
+        
+        const activitiesGrid = document.querySelector('.activities-grid');
         if (!activitiesGrid || activities.length === 0) return;
         
         activitiesGrid.innerHTML = activities.map(activity => `
