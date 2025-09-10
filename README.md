@@ -15,19 +15,34 @@
 - ✅ **Diseño responsive** para móviles
 - ✅ **Formulario de contacto**
 
-## 🎯 ¿Cómo agregar un evento? (Solo Administradores)
+## 🎯 ¿Cómo agregar un evento?
 
-### Acceso Restringido
-⚠️ **Solo los administradores pueden agregar eventos**
+### Desde el Panel de Administración
+🔧 **Todo se maneja desde el admin - Sin archivos externos**
 
-1. **Inicia sesión** en el panel de administración (`login.html`)
-2. **Ve a la sección "Eventos"** en el admin
+1. **Inicia sesión** como administrador (`login.html`)
+   - Usuario: `admin`
+   - Contraseña: `admin123`
+
+2. **Ve a la sección "Eventos"** en el panel
+
 3. **Haz clic en "Agregar Evento"**
-4. **Completa el formulario** con los datos del evento
-5. **Copia el código JSON** generado
-6. **Edita el archivo `eventos.json`** en GitHub
-7. **Pega el código** al final del array (antes del `]`)
-8. **Guarda** → ¡El evento aparece para todos!
+
+4. **Completa el formulario:**
+   - Título del evento
+   - Fecha y hora
+   - Ubicación
+   - Descripción (opcional)
+   - Imagen (opcional)
+
+5. **Haz clic en "Guardar"**
+
+6. **¡Listo!** El evento aparece inmediatamente en la página principal
+
+### Eliminar Eventos
+- Desde la misma sección de eventos en el admin
+- Haz clic en el botón "Eliminar" del evento
+- Se elimina automáticamente de toda la página
 
 ### Filtrado Automático
 ✨ **Los eventos pasados desaparecen automáticamente**
@@ -40,11 +55,10 @@
 ```
 📦 nuevaeraclub.github.io/
 ├── 📄 index.html              # Página principal
-├── 📄 admin.html              # Panel de administración
+├── 📄 admin.html              # Panel de administración ⭐
 ├── 📄 login.html              # Página de login
-├── 📄 agregar-evento.html     # Formulario simple para eventos
-├── 📄 eventos.json            # ⭐ Datos de eventos
-├── 📄 actividades.json        # ⭐ Datos de actividades
+├── 📄 eventos.json            # Datos de eventos (backup/fallback)
+├── 📄 actividades.json        # Datos de actividades (backup/fallback)
 ├── 📁 css/                    # Estilos
 │   ├── 📄 styles.css
 │   ├── 📄 admin-styles.css
@@ -58,10 +72,12 @@
 
 ## 🚀 ¿Cómo funciona?
 
-1. **GitHub Pages** sirve el sitio web estático
-2. Los **eventos y actividades** se cargan desde archivos JSON
-3. **Cualquier cambio** en los archivos JSON se refleja inmediatamente
-4. **Sin base de datos** - todo funciona con archivos estáticos
+1. **Administrador inicia sesión** en el panel de admin
+2. **Agrega/edita/elimina eventos** desde la interfaz
+3. **Los cambios se guardan** en localStorage del navegador
+4. **La página principal se actualiza** automáticamente
+5. **Los eventos pasados se ocultan** automáticamente
+6. **Sin base de datos** - todo funciona con localStorage
 
 ## 🔧 Tecnologías
 
@@ -74,12 +90,14 @@
 
 ## 👥 Para Colaboradores
 
-### Agregar Eventos
-- Usa la página: `agregar-evento.html`
-- O edita directamente: `eventos.json`
+### Agregar/Eliminar Eventos
+- **Solo desde el panel de administración**
+- Login → Sección Eventos → Agregar/Eliminar
+- **Cambios inmediatos** en la página principal
 
 ### Agregar Actividades  
-- Edita el archivo: `actividades.json`
+- Desde el panel de administración
+- Sección "Actividades"
 
 ### Hacer cambios de diseño
 - CSS principal: `css/styles.css`

@@ -2,6 +2,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load dynamic content from admin panel
     loadDynamicContent();
     
+    // Escuchar cambios desde el panel de administración
+    window.addEventListener('adminDataUpdated', function(e) {
+        console.log('Datos actualizados desde admin, recargando contenido...');
+        loadDynamicContent();
+    });
+    
     // Mobile Menu Toggle
     const menuToggle = document.querySelector('.menu-toggle');
     const menu = document.querySelector('.menu');
@@ -269,17 +275,28 @@ function loadDynamicContent() {
 // Load events from JSON file
 async function loadDynamicEvents() {
     try {
-        const response = await fetch('./eventos.json');
-        const allEvents = await response.json();
-        const eventsSlider = document.querySelector('.events-slider');
+        // Primero intentar cargar desde localStorage (datos del admin)
+        let events = JSON.parse(localStorage.getItem('clubEvents')) || [];
         
+        // Si no hay eventos en localStorage, cargar desde el archivo JSON como fallback
+        if (events.length === 0) {
+            try {
+                const response = await fetch('./eventos.json');
+                events = await response.json();
+            } catch (error) {
+                console.log('No se pudo cargar eventos.json, usando datos vacíos');
+                events = [];
+            }
+        }
+        
+        const eventsSlider = document.querySelector('.events-slider');
         if (!eventsSlider) return;
         
         // Filtrar solo eventos futuros (incluye el día actual)
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Resetear horas para comparar solo fechas
         
-        const futureEvents = allEvents.filter(event => {
+        const futureEvents = events.filter(event => {
             const eventDate = new Date(event.date);
             eventDate.setHours(0, 0, 0, 0);
             return eventDate >= today; // Incluye eventos de hoy

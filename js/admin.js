@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = 'login.html';
         return;
     }
+
+    // Initialize data if it's first time
+    initializeDefaultData();
     
     // Initialize the admin panel
     initializeAdmin();
@@ -23,7 +26,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Data Storage (usando localStorage para persistencia)
 const AdminData = {
-    events: JSON.parse(localStorage.getItem('clubEvents')) || [],
+    events: JSON.parse(localStorage.getItem('clubEvents')) || [
+        {
+            id: 1,
+            title: "Torneo de Fútbol Interno",
+            date: "2025-09-15",
+            time: "15:00",
+            location: "Cancha Principal",
+            description: "Torneo interno entre socios del club. Inscripciones abiertas.",
+            image: ""
+        },
+        {
+            id: 2,
+            title: "Cena de Gala Anual",
+            date: "2025-09-22",
+            time: "20:00",
+            location: "Salón de Eventos",
+            description: "Evento social anual con cena y espectáculo musical.",
+            image: ""
+        },
+        {
+            id: 3,
+            title: "Clase de Aqua Aeróbicos",
+            date: "2025-09-12",
+            time: "18:00",
+            location: "Piscina Climatizada",
+            description: "Clase especial de aqua aeróbicos para todos los niveles.",
+            image: ""
+        }
+    ],
     activities: JSON.parse(localStorage.getItem('clubActivities')) || [],
     config: JSON.parse(localStorage.getItem('clubConfig')) || {
         name: 'Nueva Era Club',
@@ -49,11 +80,31 @@ const AdminData = {
     },
     
     updateMainSite() {
-        // Esta función actualiza el sitio principal con los nuevos datos
-        // En una implementación real, esto sería una llamada al servidor
-        console.log('Datos actualizados en el sitio principal');
+        // Enviar evento personalizado para que el sitio principal se actualice
+        window.dispatchEvent(new CustomEvent('adminDataUpdated', {
+            detail: {
+                events: this.events,
+                activities: this.activities,
+                config: this.config
+            }
+        }));
+        console.log('Datos actualizados - señal enviada al sitio principal');
     }
 };
+
+// Inicializar datos por defecto si es la primera vez
+function initializeDefaultData() {
+    // Solo inicializar si no hay datos guardados
+    if (!localStorage.getItem('clubEvents')) {
+        AdminData.saveEvents();
+    }
+    if (!localStorage.getItem('clubActivities')) {
+        AdminData.saveActivities();
+    }
+    if (!localStorage.getItem('clubConfig')) {
+        AdminData.saveConfig();
+    }
+}
 
 // Inicializar panel de administración
 function initializeAdmin() {
