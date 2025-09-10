@@ -3,7 +3,7 @@
 ¡Bienvenido al repositorio del sitio web del Club Nueva Era!
 
 ## 🌐 Sitio Web
-**URL:** https://nuevaeraclub.github.io
+**URL:** https://augustoizo.github.io/nuevaeraclub/
 
 ## 📋 Características
 
