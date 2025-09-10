@@ -275,21 +275,10 @@ function loadDynamicContent() {
 // Load events from JSON file
 async function loadDynamicEvents() {
     try {
-        // Primero intentar cargar desde localStorage (datos del admin)
-        let events = JSON.parse(localStorage.getItem('clubEvents')) || [];
-        
-        // Si no hay eventos en localStorage, cargar desde el archivo JSON como fallback
-        if (events.length === 0) {
-            try {
-                const response = await fetch('./eventos.json');
-                events = await response.json();
-            } catch (error) {
-                console.log('No se pudo cargar eventos.json, usando datos vacíos');
-                events = [];
-            }
-        }
-        
+        // Cargar eventos desde el archivo JSON compartido
+        const events = await window.dataSync.loadEvents();
         const eventsSlider = document.querySelector('.events-slider');
+        
         if (!eventsSlider) return;
         
         // Filtrar solo eventos futuros (incluye el día actual)
@@ -342,8 +331,7 @@ async function loadDynamicEvents() {
 // Load activities from JSON file
 async function loadDynamicActivities() {
     try {
-        const response = await fetch('./actividades.json');
-        const activities = await response.json();
+        const activities = await window.dataSync.loadActivities();
         const activitiesGrid = document.querySelector('.activities-grid');
         
         if (!activitiesGrid || activities.length === 0) return;

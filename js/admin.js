@@ -178,39 +178,52 @@ function setupModals() {
 }
 
 // Gestión de Eventos
-function loadEvents() {
+async function loadEvents() {
     const eventsGrid = document.getElementById('events-grid');
     
-    if (AdminData.events.length === 0) {
+    try {
+        const events = await window.dataSync.loadEvents();
+        
+        if (events.length === 0) {
+            eventsGrid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <i class="fas fa-calendar-times"></i>
+                    <h3>No hay eventos programados</h3>
+                    <p>Agrega tu primer evento haciendo click en "Agregar Evento"</p>
+                </div>
+            `;
+            return;
+        }
+        
+        eventsGrid.innerHTML = events.map(event => `
+            <div class="admin-card">
+                <h3>${event.title}</h3>
+                <div class="meta">
+                    <span><i class="fas fa-calendar"></i> ${formatDate(event.date)}</span>
+                    <span><i class="fas fa-clock"></i> ${event.time}</span>
+                    <span><i class="fas fa-map-marker-alt"></i> ${event.location}</span>
+                </div>
+                <p>${event.description || 'Sin descripción'}</p>
+                <div class="actions">
+                    <button class="btn btn-warning" onclick="editEvent('${event.id}')">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteEvent('${event.id}')">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error loading events:', error);
         eventsGrid.innerHTML = `
-            <div class="empty-state" style="grid-column: 1 / -1;">
-                <i class="fas fa-calendar-times"></i>
-                <h3>No hay eventos programados</h3>
-                <p>Agrega tu primer evento haciendo click en "Agregar Evento"</p>
+            <div class="error-state" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #f39c12; margin-bottom: 20px;"></i>
+                <h3>Error al cargar eventos</h3>
+                <p>Intenta recargar la página</p>
             </div>
         `;
-        return;
     }
-    
-    eventsGrid.innerHTML = AdminData.events.map(event => `
-        <div class="admin-card">
-            <h3>${event.title}</h3>
-            <div class="meta">
-                <span><i class="fas fa-calendar"></i> ${formatDate(event.date)}</span>
-                <span><i class="fas fa-clock"></i> ${event.time}</span>
-                <span><i class="fas fa-map-marker-alt"></i> ${event.location}</span>
-            </div>
-            <p>${event.description || 'Sin descripción'}</p>
-            <div class="actions">
-                <button class="btn btn-warning" onclick="editEvent('${event.id}')">
-                    <i class="fas fa-edit"></i> Editar
-                </button>
-                <button class="btn btn-danger" onclick="deleteEvent('${event.id}')">
-                    <i class="fas fa-trash"></i> Eliminar
-                </button>
-            </div>
-        </div>
-    `).join('');
 }
 
 function openEventModal(eventId = null) {
@@ -251,23 +264,30 @@ function saveEvent(e) {
         time: document.getElementById('event-time').value,
         location: document.getElementById('event-location').value,
         description: document.getElementById('event-description').value,
-        image: document.getElementById('event-image').value
+        image: document.getElementById('event-image').value || ''
     };
     
-    if (form.dataset.eventId) {
-        // Actualizar evento existente
-        const index = AdminData.events.findIndex(e => e.id === form.dataset.eventId);
-        AdminData.events[index] = eventData;
-    } else {
-        // Agregar nuevo evento
-        AdminData.events.push(eventData);
-    }
-    
-    AdminData.saveEvents();
-    loadEvents();
-    
-    document.getElementById('event-modal').style.display = 'none';
-    showNotification('Evento guardado correctamente', 'success');
+    // Cargar eventos actuales y agregar/actualizar
+    window.dataSync.loadEvents().then(events => {
+        if (form.dataset.eventId) {
+            // Actualizar evento existente
+            const index = events.findIndex(e => e.id == form.dataset.eventId);
+            if (index !== -1) {
+                events[index] = eventData;
+            }
+        } else {
+            // Agregar nuevo evento
+            events.push(eventData);
+        }
+        
+        // Mostrar modal con instrucciones para actualizar el archivo
+        window.dataSync.showUpdateInstructions(events, 'eventos.json', form.dataset.eventId ? 'actualizar' : 'agregar');
+        
+        // Cerrar modal de edición
+        document.getElementById('event-modal').style.display = 'none';
+        
+        showNotification('¡Evento preparado! Sigue las instrucciones para publicarlo.', 'info');
+    });
 }
 
 function editEvent(eventId) {
