@@ -266,51 +266,61 @@ function loadDynamicContent() {
     loadDynamicConfiguration();
 }
 
-// Load events from localStorage
-function loadDynamicEvents() {
-    const events = JSON.parse(localStorage.getItem('clubEvents')) || [];
-    const eventsSlider = document.querySelector('.events-slider');
-    
-    if (!eventsSlider || events.length === 0) return;
-    
-    eventsSlider.innerHTML = events.map(event => {
-        const eventDate = new Date(event.date);
-        const day = eventDate.getDate();
-        const month = eventDate.toLocaleDateString('es-ES', { month: 'short' });
+// Load events from JSON file
+async function loadDynamicEvents() {
+    try {
+        const response = await fetch('./eventos.json');
+        const events = await response.json();
+        const eventsSlider = document.querySelector('.events-slider');
         
-        return `
-            <div class="event-card">
-                <div class="event-date">
-                    <span class="day">${day}</span>
-                    <span class="month">${month}</span>
+        if (!eventsSlider || events.length === 0) return;
+    
+        eventsSlider.innerHTML = events.map(event => {
+            const eventDate = new Date(event.date);
+            const day = eventDate.getDate();
+            const month = eventDate.toLocaleDateString('es-ES', { month: 'short' });
+            
+            return `
+                <div class="event-card">
+                    <div class="event-date">
+                        <span class="day">${day}</span>
+                        <span class="month">${month}</span>
+                    </div>
+                    <div class="event-details">
+                        <h3>${event.title}</h3>
+                        <p class="event-time"><i class="far fa-clock"></i> ${event.time}</p>
+                        <p class="event-location"><i class="fas fa-map-marker-alt"></i> ${event.location}</p>
+                        <p class="event-description">${event.description || ''}</p>
+                    </div>
                 </div>
-                <div class="event-details">
-                    <h3>${event.title}</h3>
-                    <p class="event-time"><i class="far fa-clock"></i> ${event.time}</p>
-                    <p class="event-location"><i class="fas fa-map-marker-alt"></i> ${event.location}</p>
-                    <p class="event-description">${event.description || ''}</p>
-                </div>
-            </div>
-        `;
-    }).join('');
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error loading events:', error);
+    }
 }
 
-// Load activities from localStorage
-function loadDynamicActivities() {
-    const activities = JSON.parse(localStorage.getItem('clubActivities')) || [];
-    const activitiesGrid = document.querySelector('.activities-grid');
-    
-    if (!activitiesGrid || activities.length === 0) return;
-    
-    activitiesGrid.innerHTML = activities.map(activity => `
-        <div class="activity-card">
-            <div class="activity-icon">
-                <i class="${activity.icon}"></i>
+// Load activities from JSON file
+async function loadDynamicActivities() {
+    try {
+        const response = await fetch('./actividades.json');
+        const activities = await response.json();
+        const activitiesGrid = document.querySelector('.activities-grid');
+        
+        if (!activitiesGrid || activities.length === 0) return;
+        
+        activitiesGrid.innerHTML = activities.map(activity => `
+            <div class="activity-card">
+                <div class="activity-icon">
+                    <i class="${activity.icon}"></i>
+                </div>
+                <h3>${activity.name}</h3>
+                <p>${activity.description || ''}</p>
             </div>
-            <h3>${activity.name}</h3>
-            <p>${activity.description || ''}</p>
-        </div>
-    `).join('');
+        `).join('');
+    } catch (error) {
+        console.error('Error loading activities:', error);
+    }
 }
 
 // Load configuration from localStorage

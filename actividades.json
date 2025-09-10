@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "name": "Natación",
+    "icon": "fas fa-swimmer",
+    "description": "Clases de natación para todas las edades",
+    "schedule": "Lunes a Viernes 8:00-20:00"
+  },
+  {
+    "id": 2,
+    "name": "Tenis",
+    "icon": "fas fa-table-tennis",
+    "description": "Canchas de tenis disponibles para socios",
+    "schedule": "Todos los días 6:00-22:00"
+  },
+  {
+    "id": 3,
+    "name": "Gimnasio",
+    "icon": "fas fa-dumbbell",
+    "description": "Equipamiento completo de musculación",
+    "schedule": "Lunes a Domingo 6:00-23:00"
+  },
+  {
+    "id": 4,
+    "name": "Fútbol",
+    "icon": "fas fa-futbol",
+    "description": "Canchas de fútbol 5 y 11",
+    "schedule": "Todos los días 8:00-22:00"
+  }
+]

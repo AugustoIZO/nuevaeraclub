@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Evento - Club Nueva Era</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 100px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .instructions {
+            background-color: #e2e3f1;
+            color: #383d41;
+            border: 1px solid #d6d8db;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Agregar Evento</h1>
+        
+        <div class="instructions">
+            <strong>📝 Instrucciones:</strong><br>
+            1. Completa el formulario<br>
+            2. Haz clic en "Generar Código"<br>
+            3. Copia el código generado<br>
+            4. Agrégalo al archivo eventos.json<br>
+            5. Actualiza el repositorio en GitHub
+        </div>
+
+        <div id="message"></div>
+
+        <form id="eventForm">
+            <div class="form-group">
+                <label for="title">Título del Evento:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+
+            <div class="form-group">
+                <label for="date">Fecha:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="time">Hora:</label>
+                <input type="time" id="time" name="time" required>
+            </div>
+
+            <div class="form-group">
+                <label for="location">Ubicación:</label>
+                <input type="text" id="location" name="location" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Descripción:</label>
+                <textarea id="description" name="description" placeholder="Descripción opcional del evento"></textarea>
+            </div>
+
+            <button type="submit" class="btn">🎯 Generar Código del Evento</button>
+        </form>
+
+        <div id="output" style="display: none;">
+            <h3>📋 Código generado:</h3>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #dee2e6;">
+                <pre id="jsonCode" style="white-space: pre-wrap; font-family: monospace; font-size: 12px;"></pre>
+            </div>
+            <p style="font-size: 14px; color: #666;">
+                <strong>Pasos siguientes:</strong><br>
+                1. Copia el código de arriba<br>
+                2. Abre el archivo <code>eventos.json</code><br>
+                3. Agrégalo al final del array (antes del ])<br>
+                4. No olvides la coma antes del nuevo evento<br>
+                5. Sube los cambios a GitHub
+            </p>
+        </div>
+
+        <a href="index.html" class="back-link">← Volver al inicio</a>
+    </div>
+
+    <script>
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const eventData = {
+                id: Date.now(), // Simple ID basado en timestamp
+                title: formData.get('title'),
+                date: formData.get('date'),
+                time: formData.get('time'),
+                location: formData.get('location'),
+                description: formData.get('description')
+            };
+
+            // Generar el código JSON
+            const jsonCode = JSON.stringify(eventData, null, 2);
+            
+            // Mostrar el código generado
+            document.getElementById('jsonCode').textContent = ',\n' + jsonCode;
+            document.getElementById('output').style.display = 'block';
+            
+            // Mostrar mensaje de éxito
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = '<div class="success">✅ ¡Código generado exitosamente! Ahora cópialo y agrégalo al archivo eventos.json</div>';
+            
+            // Scroll hacia el output
+            document.getElementById('output').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
