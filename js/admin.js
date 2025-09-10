@@ -182,11 +182,24 @@ async function loadEvents() {
     const eventsGrid = document.getElementById('events-grid');
     
     try {
-        // Cargar desde localStorage primero, luego desde archivo
+        // Cargar desde localStorage primero
         let events = JSON.parse(localStorage.getItem('clubEvents')) || [];
         
+        // Si no hay datos locales, cargar desde archivo JSON
         if (events.length === 0) {
-            events = await window.githubSync.loadEvents();
+            try {
+                const response = await fetch('./eventos.json?t=' + Date.now());
+                if (response.ok) {
+                    const text = await response.text();
+                    events = text.trim() ? JSON.parse(text) : [];
+                    // Guardar en localStorage para próximas veces
+                    if (events.length > 0) {
+                        localStorage.setItem('clubEvents', JSON.stringify(events));
+                    }
+                }
+            } catch (error) {
+                console.log('No se pudo cargar eventos.json');
+            }
         }
         
         if (events.length === 0) {
@@ -263,7 +276,7 @@ async function saveEvent(e) {
     
     const form = e.target;
     const eventData = {
-        id: form.dataset.eventId || window.githubSync.generateId(),
+        id: form.dataset.eventId || Date.now().toString(),
         title: document.getElementById('event-title').value,
         date: document.getElementById('event-date').value,
         time: document.getElementById('event-time').value,
@@ -287,8 +300,20 @@ async function saveEvent(e) {
             events.push(eventData);
         }
         
-        // Guardar usando el nuevo sistema
-        await window.githubSync.saveEvents(events);
+        // Guardar en localStorage
+        localStorage.setItem('clubEvents', JSON.stringify(events));
+        
+        // Mostrar notificación de éxito
+        if (window.githubSync) {
+            window.githubSync.showSyncNotification(events);
+        } else {
+            showNotification('Evento guardado correctamente', 'success');
+        }
+        
+        // Disparar evento para actualización inmediata
+        window.dispatchEvent(new CustomEvent('eventsUpdated', { 
+            detail: { events } 
+        }));
         
         // Recargar la lista de eventos
         loadEvents();
@@ -312,9 +337,15 @@ async function deleteEvent(eventId) {
             let events = JSON.parse(localStorage.getItem('clubEvents')) || [];
             events = events.filter(e => e.id != eventId);
             
-            await window.githubSync.saveEvents(events);
-            loadEvents();
+            // Guardar en localStorage
+            localStorage.setItem('clubEvents', JSON.stringify(events));
             
+            // Disparar evento para actualización
+            window.dispatchEvent(new CustomEvent('eventsUpdated', { 
+                detail: { events } 
+            }));
+            
+            loadEvents();
             showNotification('Evento eliminado correctamente', 'success');
         } catch (error) {
             console.error('Error deleting event:', error);

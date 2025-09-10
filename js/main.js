@@ -280,12 +280,25 @@ function loadDynamicContent() {
 // Load events from JSON file
 async function loadDynamicEvents() {
     try {
-        // Intentar cargar desde localStorage primero (datos inmediatos del admin)
+        // Sistema híbrido: localStorage primero, luego archivo JSON
         let events = JSON.parse(localStorage.getItem('clubEvents')) || [];
         
-        // Si no hay datos locales, cargar desde archivo JSON
-        if (events.length === 0) {
+        // Si no hay datos locales Y githubSync está disponible, cargar desde archivo
+        if (events.length === 0 && window.githubSync) {
             events = await window.githubSync.loadEvents();
+        }
+        
+        // Si aún no hay datos, cargar desde archivo JSON directamente
+        if (events.length === 0) {
+            try {
+                const response = await fetch('./eventos.json?t=' + Date.now());
+                if (response.ok) {
+                    const text = await response.text();
+                    events = text.trim() ? JSON.parse(text) : [];
+                }
+            } catch (error) {
+                console.log('Fallback: no se pudo cargar eventos.json');
+            }
         }
         
         const eventsSlider = document.querySelector('.events-slider');
@@ -341,12 +354,25 @@ async function loadDynamicEvents() {
 // Load activities from JSON file
 async function loadDynamicActivities() {
     try {
-        // Intentar cargar desde localStorage primero
+        // Sistema híbrido: localStorage primero, luego archivo JSON
         let activities = JSON.parse(localStorage.getItem('clubActivities')) || [];
         
-        // Si no hay datos locales, cargar desde archivo JSON
-        if (activities.length === 0) {
+        // Si no hay datos locales Y githubSync está disponible, cargar desde archivo
+        if (activities.length === 0 && window.githubSync) {
             activities = await window.githubSync.loadActivities();
+        }
+        
+        // Si aún no hay datos, cargar desde archivo JSON directamente
+        if (activities.length === 0) {
+            try {
+                const response = await fetch('./actividades.json?t=' + Date.now());
+                if (response.ok) {
+                    const text = await response.text();
+                    activities = text.trim() ? JSON.parse(text) : [];
+                }
+            } catch (error) {
+                console.log('Fallback: no se pudo cargar actividades.json');
+            }
         }
         
         const activitiesGrid = document.querySelector('.activities-grid');
