@@ -15,25 +15,29 @@
 - ✅ **Diseño responsive** para móviles
 - ✅ **Formulario de contacto**
 
-## 🎯 ¿Cómo agregar un evento? (Solo Administradores)
+## 🎯 ¿Cómo agregar un evento?
 
-### Acceso Restringido
-⚠️ **Solo los administradores pueden agregar eventos**
+### Opción 1: Página Simple (Recomendada)
+1. Ve a: https://nuevaeraclub.github.io/agregar-evento.html
+2. Completa el formulario
+3. Copia el código JSON generado
+4. Edita el archivo `eventos.json` en GitHub
+5. Pega el código al final del array (antes del `]`)
+6. ¡Guarda y listo! El evento aparecerá en el sitio
 
-1. **Inicia sesión** en el panel de administración (`login.html`)
-2. **Ve a la sección "Eventos"** en el admin
-3. **Haz clic en "Agregar Evento"**
-4. **Completa el formulario** con los datos del evento
-5. **Copia el código JSON** generado
-6. **Edita el archivo `eventos.json`** en GitHub
-7. **Pega el código** al final del array (antes del `]`)
-8. **Guarda** → ¡El evento aparece para todos!
-
-### Filtrado Automático
-✨ **Los eventos pasados desaparecen automáticamente**
-- Solo se muestran eventos de hoy en adelante
-- No necesitas eliminar eventos manualmente
-- Si no hay eventos futuros, se muestra un mensaje informativo
+### Opción 2: Editar directamente
+1. Abre el archivo `eventos.json`
+2. Agrega tu evento siguiendo este formato:
+```json
+{
+  "id": 1234567890,
+  "title": "Nombre del Evento",
+  "date": "2025-09-15",
+  "time": "15:00",
+  "location": "Ubicación",
+  "description": "Descripción opcional"
+}
+```
 
 ## 📁 Estructura del Proyecto
 

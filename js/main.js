@@ -270,12 +270,34 @@ function loadDynamicContent() {
 async function loadDynamicEvents() {
     try {
         const response = await fetch('./eventos.json');
-        const events = await response.json();
+        const allEvents = await response.json();
         const eventsSlider = document.querySelector('.events-slider');
         
-        if (!eventsSlider || events.length === 0) return;
+        if (!eventsSlider) return;
+        
+        // Filtrar solo eventos futuros (incluye el día actual)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Resetear horas para comparar solo fechas
+        
+        const futureEvents = allEvents.filter(event => {
+            const eventDate = new Date(event.date);
+            eventDate.setHours(0, 0, 0, 0);
+            return eventDate >= today; // Incluye eventos de hoy
+        });
+        
+        // Si no hay eventos futuros, mostrar mensaje
+        if (futureEvents.length === 0) {
+            eventsSlider.innerHTML = `
+                <div class="no-events-message" style="text-align: center; padding: 40px; color: #666;">
+                    <i class="fas fa-calendar-times" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.5;"></i>
+                    <h3>No hay eventos próximos</h3>
+                    <p>Mantente atento a nuestras redes sociales para próximos anuncios</p>
+                </div>
+            `;
+            return;
+        }
     
-        eventsSlider.innerHTML = events.map(event => {
+        eventsSlider.innerHTML = futureEvents.map(event => {
             const eventDate = new Date(event.date);
             const day = eventDate.getDate();
             const month = eventDate.toLocaleDateString('es-ES', { month: 'short' });

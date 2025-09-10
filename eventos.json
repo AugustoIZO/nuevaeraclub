@@ -14,5 +14,21 @@
     "time": "20:00",
     "location": "Salón de Eventos",
     "description": "Evento social anual con cena y espectáculo musical."
+  },
+  {
+    "id": 3,
+    "title": "Clase de Aqua Aeróbicos",
+    "date": "2025-09-12",
+    "time": "18:00",
+    "location": "Piscina Climatizada",
+    "description": "Clase especial de aqua aeróbicos para todos los niveles."
+  },
+  {
+    "id": 4,
+    "title": "Torneo de Tenis Dobles",
+    "date": "2025-10-05",
+    "time": "09:00",
+    "location": "Canchas de Tenis",
+    "description": "Inscripciones hasta el 30 de septiembre. Premios para los ganadores."
   }
 ]

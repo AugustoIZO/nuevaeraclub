@@ -188,6 +188,16 @@
     </div>
 
     <script>
+        // Verificar si el usuario está autenticado como admin
+        window.onload = function() {
+            const isLoggedIn = localStorage.getItem('isAdminLoggedIn');
+            if (!isLoggedIn || isLoggedIn !== 'true') {
+                alert('⛔ Acceso denegado. Solo administradores pueden agregar eventos.');
+                window.location.href = 'login.html';
+                return;
+            }
+        };
+
         document.getElementById('eventForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
